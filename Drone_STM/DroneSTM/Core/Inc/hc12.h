@@ -1,0 +1,95 @@
+
+#ifndef INC_HC12_H_
+#define INC_HC12_H_
+
+#include <main.h>
+
+#define Drone_ID 0x22
+
+#define Frame_Lenght      13
+#define Start_Frame_Byte  0xAA
+#define End_Frame_Byte    0xBB
+
+#define Frame_Start_Index     	0
+#define Frame_ID_Index        	1
+#define Frame_Service_Index   	2
+#define Frame_Data_Begin_Index  3
+#define Frame_Checksum_Index 	11
+#define Frame_End_Index      	12
+
+#define Read_Mode      	    0xB1
+#define Answare_Mode     	0xA1
+#define Read_Deplacement    0xB2
+#define Answare_Deplacement 0xA2
+#define Answare_GPS			0xA3
+#define Answare_Batterie	0xA4
+
+#define Mode_Initialisation 0xA1
+#define Mode_IDLE 			0xA3
+#define Mode_Atterrissage 	0xB1
+#define Mode_Decollage 		0xB2
+#define Mode_Erreur 		0xEE
+#define Mode_Manuel 		0xC1
+#define Mode_Autonome 		0xC2
+
+
+// HC12 structure
+typedef struct
+{
+	uint8_t Uart_rx_buffer[Frame_Lenght];
+	uint8_t Uart_rx_data;
+	uint8_t Uart_rx_cnt;
+	uint8_t Uart_rx_flag;
+
+	uint8_t Frame_To_Send[Frame_Lenght];
+	uint8_t Frame_Read[Frame_Lenght];
+
+	uint8_t Current_Drone_Mode;
+	uint8_t Last_Drone_Mode;
+
+	int16_t Dep_Target_X;
+	int16_t Dep_Target_Y;
+	int16_t Dep_Target_Z;
+	int16_t Dep_Target_V;
+
+	int16_t GPS_X;
+	int16_t GPS_Y;
+	int16_t GPS_Z;
+
+	int16_t V_bat;
+
+} HC12_t;
+
+
+void hc12_init(HC12_t *DataStruct);
+
+void hc12_uart_new_byte_management(HC12_t *DataStruct);
+
+void hc12_manage_new_recived_frames(UART_HandleTypeDef *huart_debug, UART_HandleTypeDef *huart_hc12, HC12_t *DataStruct);
+
+uint8_t hc12_read_master_frame(HC12_t *DataStruct);
+uint8_t hc12_update_answare_frame(HC12_t *DataStruct);
+uint8_t hc12_answer_to_master(UART_HandleTypeDef *huartx, HC12_t *DataStruct);
+
+uint8_t hc12_calcul_send_frame_checksum(HC12_t *DataStruct);
+uint8_t hc12_calcul_read_frame_checksum(HC12_t *DataStruct);
+
+void hc12_reset_frames(HC12_t *DataStruct);
+
+void hc12_service_A1_mode_requete(HC12_t *DataStruct);
+void hc12_service_B1_mode_ordre(HC12_t *DataStruct);
+void hc12_service_A2_dep_requete(HC12_t *DataStruct);
+void hc12_service_B2_dep_ordre(HC12_t *DataStruct);
+void hc12_service_A3_gps_requete(HC12_t *DataStruct);
+void hc12_service_A4_batterie_requete(HC12_t *DataStruct);
+
+uint8_t hc12_get_high_byte(int16_t value);
+uint8_t hc12_get_low_byte(int16_t value);
+int16_t hc12_get_value(uint8_t high, uint8_t low);
+
+void hc12_print_drone_data(UART_HandleTypeDef *huartx, HC12_t *DataStruct);
+void hc12_print_read_frame(UART_HandleTypeDef *huartx, HC12_t *DataStruct);
+void hc12_print_send_frame(UART_HandleTypeDef *huartx, HC12_t *DataStruct);
+void hc12_error_msg (UART_HandleTypeDef *huartx);
+
+#endif /* INC_HC12_H_ */

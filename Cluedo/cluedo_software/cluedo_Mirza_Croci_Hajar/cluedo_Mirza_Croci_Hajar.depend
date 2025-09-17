@@ -1,0 +1,289 @@
+# depslib dependency file v1.0
+1638023389 source:c:\users\vladm\onedrive\desktop\ece\ing 2\info\projet\code\cluedo_mirza_croci_hajar\main.cpp
+	<allegro.h>
+	<stack>
+	<time.h>
+	<iostream>
+	"header.h"
+	"classes.cpp"
+	"sous-prg.cpp"
+	"menu.cpp"
+	"perso.cpp"
+	"cartes.cpp"
+	"chambre.cpp"
+	"blocNote.cpp"
+	<vector>
+
+1638040933 c:\users\vladm\onedrive\desktop\ece\ing 2\info\projet\code\cluedo_mirza_croci_hajar\header.h
+	<vector>
+
+1638040974 c:\users\vladm\onedrive\desktop\ece\ing 2\info\projet\code\cluedo_mirza_croci_hajar\classes.cpp
+	"header.h"
+	<vector>
+	<iostream>
+	<fstream>
+	<string>
+
+1638041363 c:\users\vladm\onedrive\desktop\ece\ing 2\info\projet\code\cluedo_mirza_croci_hajar\sous-prg.cpp
+	"header.h"
+	<vector>
+
+1638039448 c:\users\vladm\onedrive\desktop\ece\ing 2\info\projet\code\cluedo_mirza_croci_hajar\menu.cpp
+	"header.h"
+	<vector>
+
+1638028263 c:\users\vladm\onedrive\desktop\ece\ing 2\info\projet\code\cluedo_mirza_croci_hajar\perso.cpp
+	"header.h"
+	<vector>
+
+1638005385 c:\users\vladm\onedrive\desktop\ece\ing 2\info\projet\code\cluedo_mirza_croci_hajar\cartes.cpp
+	"header.h"
+	<vector>
+
+1638031810 c:\users\vladm\onedrive\desktop\ece\ing 2\info\projet\code\cluedo_mirza_croci_hajar\chambre.cpp
+	"header.h"
+	<vector>
+
+1638005509 c:\users\vladm\onedrive\desktop\ece\ing 2\info\projet\code\cluedo_mirza_croci_hajar\blocnote.cpp
+	"header.h"
+	<vector>
+
+1637951191 source:c:\users\dorian\downloads\cluedo_mirza_croci_hajar (1)\cluedo_mirza_croci_hajar\main.cpp
+	<allegro.h>
+	<stack>
+	<time.h>
+	<iostream>
+	"header.h"
+	"classes.cpp"
+	"sous-prg.cpp"
+	"menu.cpp"
+	"perso.cpp"
+	"cartes.cpp"
+	"chambre.cpp"
+	"blocNote.cpp"
+	<vector>
+
+1637963131 c:\users\dorian\downloads\cluedo_mirza_croci_hajar (1)\cluedo_mirza_croci_hajar\header.h
+	<vector>
+
+1637963131 c:\users\dorian\downloads\cluedo_mirza_croci_hajar (1)\cluedo_mirza_croci_hajar\classes.cpp
+	"header.h"
+	<vector>
+
+1637951193 c:\users\dorian\downloads\cluedo_mirza_croci_hajar (1)\cluedo_mirza_croci_hajar\sous-prg.cpp
+	"header.h"
+	<vector>
+
+1637951191 c:\users\dorian\downloads\cluedo_mirza_croci_hajar (1)\cluedo_mirza_croci_hajar\menu.cpp
+	"header.h"
+	<vector>
+
+1637963131 c:\users\dorian\downloads\cluedo_mirza_croci_hajar (1)\cluedo_mirza_croci_hajar\perso.cpp
+	"header.h"
+	<vector>
+
+1637951189 c:\users\dorian\downloads\cluedo_mirza_croci_hajar (1)\cluedo_mirza_croci_hajar\cartes.cpp
+	"header.h"
+	<vector>
+
+1637951189 c:\users\dorian\downloads\cluedo_mirza_croci_hajar (1)\cluedo_mirza_croci_hajar\chambre.cpp
+	"header.h"
+	<vector>
+
+1637964118 c:\users\dorian\downloads\cluedo_mirza_croci_hajar (1)\cluedo_mirza_croci_hajar\blocnote.cpp
+	"header.h"
+	<vector>
+
+1638005386 source:c:\users\vladm\onedrive\desktop\ece\ing 2\info\projet\code\cluedo_mirza_croci_hajar (1)\cluedo_mirza_croci_hajar\main.cpp
+	<allegro.h>
+	<stack>
+	<time.h>
+	<iostream>
+	"header.h"
+	"classes.cpp"
+	"sous-prg.cpp"
+	"menu.cpp"
+	"perso.cpp"
+	"cartes.cpp"
+	"chambre.cpp"
+	"blocNote.cpp"
+	<vector>
+
+1638005386 c:\users\vladm\onedrive\desktop\ece\ing 2\info\projet\code\cluedo_mirza_croci_hajar (1)\cluedo_mirza_croci_hajar\header.h
+	<vector>
+
+1638012788 c:\users\vladm\onedrive\desktop\ece\ing 2\info\projet\code\cluedo_mirza_croci_hajar (1)\cluedo_mirza_croci_hajar\classes.cpp
+	"header.h"
+	<vector>
+
+1638012777 c:\users\vladm\onedrive\desktop\ece\ing 2\info\projet\code\cluedo_mirza_croci_hajar (1)\cluedo_mirza_croci_hajar\sous-prg.cpp
+	"header.h"
+	<vector>
+
+1638005386 c:\users\vladm\onedrive\desktop\ece\ing 2\info\projet\code\cluedo_mirza_croci_hajar (1)\cluedo_mirza_croci_hajar\menu.cpp
+	"header.h"
+	<vector>
+
+1638005386 c:\users\vladm\onedrive\desktop\ece\ing 2\info\projet\code\cluedo_mirza_croci_hajar (1)\cluedo_mirza_croci_hajar\perso.cpp
+	"header.h"
+	<vector>
+
+1638005385 c:\users\vladm\onedrive\desktop\ece\ing 2\info\projet\code\cluedo_mirza_croci_hajar (1)\cluedo_mirza_croci_hajar\cartes.cpp
+	"header.h"
+	<vector>
+
+1638005385 c:\users\vladm\onedrive\desktop\ece\ing 2\info\projet\code\cluedo_mirza_croci_hajar (1)\cluedo_mirza_croci_hajar\chambre.cpp
+	"header.h"
+	<vector>
+
+1638005509 c:\users\vladm\onedrive\desktop\ece\ing 2\info\projet\code\cluedo_mirza_croci_hajar (1)\cluedo_mirza_croci_hajar\blocnote.cpp
+	"header.h"
+	<vector>
+
+1638053104 source:c:\users\dorian\downloads\cluedo_mirza_croci_hajar (10)\cluedo_mirza_croci_hajar\main.cpp
+	<allegro.h>
+	<stack>
+	<time.h>
+	<iostream>
+	"header.h"
+	"classes.cpp"
+	"sous-prg.cpp"
+	"menu.cpp"
+	"perso.cpp"
+	"cartes.cpp"
+	"chambre.cpp"
+	"blocNote.cpp"
+	<vector>
+
+1638053104 c:\users\dorian\downloads\cluedo_mirza_croci_hajar (10)\cluedo_mirza_croci_hajar\header.h
+	<vector>
+
+1638094327 c:\users\dorian\downloads\cluedo_mirza_croci_hajar (10)\cluedo_mirza_croci_hajar\classes.cpp
+	"header.h"
+	<vector>
+	<iostream>
+	<fstream>
+	<string>
+
+1638053105 c:\users\dorian\downloads\cluedo_mirza_croci_hajar (10)\cluedo_mirza_croci_hajar\sous-prg.cpp
+	"header.h"
+	<vector>
+
+1638053104 c:\users\dorian\downloads\cluedo_mirza_croci_hajar (10)\cluedo_mirza_croci_hajar\menu.cpp
+	"header.h"
+	<vector>
+
+1638053104 c:\users\dorian\downloads\cluedo_mirza_croci_hajar (10)\cluedo_mirza_croci_hajar\perso.cpp
+	"header.h"
+	<vector>
+
+1638053103 c:\users\dorian\downloads\cluedo_mirza_croci_hajar (10)\cluedo_mirza_croci_hajar\cartes.cpp
+	"header.h"
+	<vector>
+
+1638054188 c:\users\dorian\downloads\cluedo_mirza_croci_hajar (10)\cluedo_mirza_croci_hajar\chambre.cpp
+	"header.h"
+	<vector>
+
+1638053102 c:\users\dorian\downloads\cluedo_mirza_croci_hajar (10)\cluedo_mirza_croci_hajar\blocnote.cpp
+	"header.h"
+	<vector>
+
+1638053106 source:c:\users\dorian\downloads\cluedo_mirza_croci_hajar (11)\cluedo_mirza_croci_hajar (10)\cluedo_mirza_croci_hajar\main.cpp
+	<allegro.h>
+	<stack>
+	<time.h>
+	<iostream>
+	"header.h"
+	"classes.cpp"
+	"sous-prg.cpp"
+	"menu.cpp"
+	"perso.cpp"
+	"cartes.cpp"
+	"chambre.cpp"
+	"blocNote.cpp"
+	<vector>
+
+1638053106 c:\users\dorian\downloads\cluedo_mirza_croci_hajar (11)\cluedo_mirza_croci_hajar (10)\cluedo_mirza_croci_hajar\header.h
+	<vector>
+
+1638102881 c:\users\dorian\downloads\cluedo_mirza_croci_hajar (11)\cluedo_mirza_croci_hajar (10)\cluedo_mirza_croci_hajar\classes.cpp
+	"header.h"
+	<vector>
+	<iostream>
+	<fstream>
+	<string>
+
+1638053106 c:\users\dorian\downloads\cluedo_mirza_croci_hajar (11)\cluedo_mirza_croci_hajar (10)\cluedo_mirza_croci_hajar\sous-prg.cpp
+	"header.h"
+	<vector>
+
+1638053106 c:\users\dorian\downloads\cluedo_mirza_croci_hajar (11)\cluedo_mirza_croci_hajar (10)\cluedo_mirza_croci_hajar\menu.cpp
+	"header.h"
+	<vector>
+
+1638053106 c:\users\dorian\downloads\cluedo_mirza_croci_hajar (11)\cluedo_mirza_croci_hajar (10)\cluedo_mirza_croci_hajar\perso.cpp
+	"header.h"
+	<vector>
+
+1638053104 c:\users\dorian\downloads\cluedo_mirza_croci_hajar (11)\cluedo_mirza_croci_hajar (10)\cluedo_mirza_croci_hajar\cartes.cpp
+	"header.h"
+	<vector>
+
+1638105201 c:\users\dorian\downloads\cluedo_mirza_croci_hajar (11)\cluedo_mirza_croci_hajar (10)\cluedo_mirza_croci_hajar\chambre.cpp
+	"header.h"
+	<vector>
+
+1638053104 c:\users\dorian\downloads\cluedo_mirza_croci_hajar (11)\cluedo_mirza_croci_hajar (10)\cluedo_mirza_croci_hajar\blocnote.cpp
+	"header.h"
+	<vector>
+
+1638117928 source:c:\users\vladm\onedrive\desktop\ece\ing 2\info\projet\code\cluedo_mirza_croci_hajar (11)\cluedo_mirza_croci_hajar (10)\cluedo_mirza_croci_hajar\main.cpp
+	<allegro.h>
+	<stack>
+	<time.h>
+	<iostream>
+	"header.h"
+	"classes.cpp"
+	"sous-prg.cpp"
+	"menu.cpp"
+	"perso.cpp"
+	"cartes.cpp"
+	"chambre.cpp"
+	"blocNote.cpp"
+	<vector>
+
+1638123601 c:\users\vladm\onedrive\desktop\ece\ing 2\info\projet\code\cluedo_mirza_croci_hajar (11)\cluedo_mirza_croci_hajar (10)\cluedo_mirza_croci_hajar\header.h
+	<vector>
+
+1638127046 c:\users\vladm\onedrive\desktop\ece\ing 2\info\projet\code\cluedo_mirza_croci_hajar (11)\cluedo_mirza_croci_hajar (10)\cluedo_mirza_croci_hajar\classes.cpp
+	"header.h"
+	<vector>
+	<iostream>
+	<fstream>
+	<string>
+
+1638119943 c:\users\vladm\onedrive\desktop\ece\ing 2\info\projet\code\cluedo_mirza_croci_hajar (11)\cluedo_mirza_croci_hajar (10)\cluedo_mirza_croci_hajar\sous-prg.cpp
+	"header.h"
+	<vector>
+
+1638123433 c:\users\vladm\onedrive\desktop\ece\ing 2\info\projet\code\cluedo_mirza_croci_hajar (11)\cluedo_mirza_croci_hajar (10)\cluedo_mirza_croci_hajar\menu.cpp
+	"header.h"
+	<vector>
+
+1638119943 c:\users\vladm\onedrive\desktop\ece\ing 2\info\projet\code\cluedo_mirza_croci_hajar (11)\cluedo_mirza_croci_hajar (10)\cluedo_mirza_croci_hajar\perso.cpp
+	"header.h"
+	<vector>
+
+1638114002 c:\users\vladm\onedrive\desktop\ece\ing 2\info\projet\code\cluedo_mirza_croci_hajar (11)\cluedo_mirza_croci_hajar (10)\cluedo_mirza_croci_hajar\cartes.cpp
+	"header.h"
+	<vector>
+
+1638128507 c:\users\vladm\onedrive\desktop\ece\ing 2\info\projet\code\cluedo_mirza_croci_hajar (11)\cluedo_mirza_croci_hajar (10)\cluedo_mirza_croci_hajar\chambre.cpp
+	"header.h"
+	<vector>
+
+1638116008 c:\users\vladm\onedrive\desktop\ece\ing 2\info\projet\code\cluedo_mirza_croci_hajar (11)\cluedo_mirza_croci_hajar (10)\cluedo_mirza_croci_hajar\blocnote.cpp
+	"header.h"
+	<vector>
+

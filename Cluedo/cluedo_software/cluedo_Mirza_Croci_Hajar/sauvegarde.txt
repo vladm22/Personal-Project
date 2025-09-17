@@ -1,0 +1,2 @@
+le joueur : vlad ayant pour mot de passe : vlad a joue sa  : 1partie et a perdu
+le joueur : vica ayant pour mot de passe : vlad a joue sa  : 1partie et a gagne

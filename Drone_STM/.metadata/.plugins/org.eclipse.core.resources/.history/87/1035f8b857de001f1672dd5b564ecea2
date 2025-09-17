@@ -1,0 +1,9 @@
+../Core/Src/main.cpp:67:5:int main()	6
+../Core/Src/main.cpp:202:6:void SystemClock_Config()	3
+../Core/Src/main.cpp:235:6:void HAL_GPIO_EXTI_Callback(uint16_t)	17
+../Core/Src/main.cpp:339:6:void Error_Handler()	1
+../Core/Src/main.cpp:355:6:void HAL_UART_TxCpltCallback(UART_HandleTypeDef*)	1
+../Core/Src/main.cpp:359:6:void HAL_UART_TxHalfCpltCallback(UART_HandleTypeDef*)	1
+../Core/Src/main.cpp:361:1:void __static_initialization_and_destruction_0(int, int)	5
+../Core/Src/main.cpp:361:1:cpp)	1
+../Core/Src/main.cpp:361:1:cpp)	1

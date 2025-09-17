@@ -1,0 +1,369 @@
+#include "main.h"
+#include "gpio.h"
+#include "dma.h"
+#include "usart.h"
+#include "tim.h"
+#include "i2c.h"
+#include "mpu6050.h"
+#include "utils.h"
+#include "pid.h"
+#include "filter.h"
+
+#include <stdio.h>
+#include <cstring>
+
+// Used for debug only - Do not forget to remove props for testing
+#define MOTOR_CAN_TURN 1 	// 0 = Motor cannot turn :(
+							// 1 = Motor can turn - Caution :)
+#define SAMPLE_MCU_OFFSET 300
+
+#define MIN_PWM_INPUT_RECEIVER 1000 	// 1ms (5% de 20ms)
+#define MAX_PWM_INPUT_RECEIVER 2000 // 2ms (10% de 20ms)
+#define MIN_PWM_COUNTER 1800 // 1800 sur 36000 = 5%
+#define MAX_PWM_COUNTER 3600 // 3600 sur 36000 = 10%
+
+void SystemClock_Config(void);
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin); // Callback on the GPIO pins
+uint32_t Constrain(uint32_t min, uint32_t max, uint32_t value);
+void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart);
+void HAL_UART_TxHalfCpltCallback(UART_HandleTypeDef *huart);
+
+// UART
+int data_lenght = 0;
+char TXBuffer[126];
+bool TX_is_Sent = true;
+
+
+// PWM From the receiver
+volatile MovingAverage PWM_Roll(30);
+volatile MovingAverage PWM_Pitch(30);
+volatile MovingAverage PWM_Thrust(30);
+volatile MovingAverage PWM_Yaw(30);
+
+// MPU6050
+MPU6050_t MPU6050;
+// Calculating MPU Offset
+double X_Offset = 0;
+double Y_Offset = 0;
+double X_Angle = 0;
+double Y_Angle = 0;
+
+// PWM output calculated
+int32_t PWM_ALL_MOTORS = 1750; // [1800 - 3600]
+int32_t PWM_FL = 1750;
+int32_t PWM_FR = 1750;
+int32_t PWM_BL = 1750;
+int32_t PWM_BR = 1750;
+
+double correction_Roll = 0;
+double correction_Pitch = 0;
+
+PID PID_Roll;
+PID PID_Pitch;
+
+// Security
+bool KILL_SWITCH = false;
+
+int main(void)
+{
+  HAL_Init();
+  SystemClock_Config();
+  MX_GPIO_Init(); 			// GPIO init (normal ones and exti)
+  MX_DMA_Init();
+  MX_USART1_UART_Init(); 	// usart
+  MX_I2C1_Init();			// i2c
+  MX_TIM1_Init();			// Timer for the measures of the PWM
+  MX_TIM2_Init();			// Timer for the generation of the PWM
+
+  // Starting the timer for the PWM measures
+  HAL_TIM_Base_Start(&htim1);
+  __HAL_TIM_SET_COUNTER(&htim1,0);
+
+  // 4x PWM Generator for the motors
+  if(MOTOR_CAN_TURN){
+	  /*
+	   * PWM are generated based on the counter of timer2 ; between 0 to 36'000
+	   * If you want 50% duty cycle, you must put the TIM_CHANNEL_X at 18'000
+	   * The normal use of the PWM for the motors to turn (with FS-i10AB receiver)
+	   * is between 5% and 10% at 50Hz - 1'800 to 3'600
+	   */
+	  HAL_TIM_Base_Start(&htim2);
+	  __HAL_TIM_SET_COUNTER(&htim2,0);
+	  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
+	  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
+	  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_3);
+	  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_4);
+	  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, 1750); // Gestion du PWM avec le Thrust
+	  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 1750); // Gestion du PWM avec le Thrust
+	  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_3, 1750); // Gestion du PWM avec le Thrust
+	  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_4, 1750); // Gestion du PWM avec le Thrust
+  }
+
+  HAL_Delay(3500); // Wait 3 seconds
+
+  // MPU6050 Sampling
+  while(MPU6050_Init(&hi2c1) == 1);
+  sprintf(TXBuffer, "Calculating offset");
+  debug_uart(TXBuffer);
+
+
+  for(int i {0}; i < SAMPLE_MCU_OFFSET; i++){
+	  // X axis
+	  MPU6050_Read_All(&hi2c1, &MPU6050);
+	  X_Offset += MPU6050.KalmanAngleX;
+	  Y_Offset += MPU6050.KalmanAngleY;
+	  HAL_Delay(50);
+	  HAL_GPIO_TogglePin(LED_13_GPIO_Port, LED_13_Pin);
+	  sprintf(TXBuffer, ".");
+	  debug_uart(TXBuffer);
+  }
+
+  X_Offset /= SAMPLE_MCU_OFFSET;
+  Y_Offset /= SAMPLE_MCU_OFFSET;
+
+  sprintf(TXBuffer, "\nOffsetX: %f\nOffsetY: %f\n", X_Offset, Y_Offset);
+  debug_uart(TXBuffer);
+
+  HAL_Delay(1500);
+  HAL_GPIO_WritePin(LED_13_GPIO_Port, LED_13_Pin, GPIO_PIN_SET);
+
+  // PID
+  PID_Roll.Kp = 10.5;
+  PID_Roll.Ki = 0;
+  PID_Roll.Kd = 30;
+  PID_Roll.setpoint = 0;
+  PID_Roll.integral = 0;
+  PID_Roll.previous_error = 0;
+
+  PID_Pitch.Kp = 10.5;
+  PID_Pitch.Ki = 0;
+  PID_Pitch.Kd = 300;
+  PID_Pitch.setpoint = 0;
+  PID_Pitch.integral = 0;
+  PID_Pitch.previous_error = 0;
+
+  while (1) // 518 Hz (At 72Mhz clock)
+  {
+	  HAL_GPIO_TogglePin(WHILE_STATE_GPIO_Port, WHILE_STATE_Pin);
+	  MPU6050_Read_All(&hi2c1, &MPU6050);
+
+	  if(TX_is_Sent){
+		  TX_is_Sent = false;
+		  //int data_length = snprintf(TXBuffer, sizeof(TXBuffer), "%f, %f, %f, %f, %ld, %ld, %ld, %ld, %d, %d\n", MPU6050.KalmanAngleX - X_Offset, MPU6050.KalmanAngleY - Y_Offset, -90.f, 90.f, PWM_FL, PWM_FR, PWM_BL, PWM_BR, 1800, 3600);
+		  int data_length = snprintf(TXBuffer, sizeof(TXBuffer), "%ld, %ld, %ld, %ld, %d, %d\n", PWM_FL, PWM_FR, PWM_BL, PWM_BR, 1800, 3600);
+
+		  HAL_UART_Transmit_DMA(&huart1, (uint8_t *)TXBuffer, data_length);
+	  }
+
+	  if(KILL_SWITCH){
+		  Error_Handler();
+	  }
+
+	  if(MOTOR_CAN_TURN){
+		  if(PWM_Thrust.getAverage() < 1100){ // Security : Motor cannot turn below 1.1ms of PWM
+			  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, 1750); // Gestion du PWM avec le Thrust
+			  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 1750); // Gestion du PWM avec le Thrust
+			  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_3, 1750); // Gestion du PWM avec le Thrust
+			  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_4, 1750); // Gestion du PWM avec le Thrust
+
+			  PID_Roll.integral = 0;
+			  PID_Roll.previous_error = 0;
+
+			  PID_Pitch.integral = 0;
+			  PID_Pitch.previous_error = 0;
+		  }
+
+		  else{
+			  //PWM_ALL_MOTORS = (PWM_Thrust.getAverage() - 10) * 1800/1000;
+			  PWM_ALL_MOTORS = map(PWM_Thrust.getAverage(), 1000, 2000, 1800, 3600);
+			  PWM_ALL_MOTORS = Constrain(MIN_PWM_COUNTER, MAX_PWM_COUNTER, PWM_ALL_MOTORS);
+
+			  correction_Roll = Compute_PID(PID_Roll, MPU6050.KalmanAngleX - X_Offset);
+			  correction_Pitch = Compute_PID(PID_Pitch, MPU6050.KalmanAngleY - Y_Offset);
+
+			  PWM_FL = PWM_ALL_MOTORS + correction_Roll + correction_Pitch;
+			  PWM_FR = PWM_ALL_MOTORS + correction_Roll - correction_Pitch;
+			  PWM_BL = PWM_ALL_MOTORS - correction_Roll + correction_Pitch;
+			  PWM_BR = PWM_ALL_MOTORS - correction_Roll - correction_Pitch;
+
+			  PWM_FL = Constrain(1800, 3600, PWM_FL);
+			  PWM_FR = Constrain(1800, 3600, PWM_FR);
+			  PWM_BL = Constrain(1800, 3600, PWM_BL);
+			  PWM_BR = Constrain(1800, 3600, PWM_BR);
+
+			  // VERIFIER L'ORDRE DES MOTEURS !
+			  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, PWM_FL); // Gestion du PWM avec le Thrust
+			  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, PWM_FR); // Gestion du PWM avec le Thrust
+			  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_3, PWM_BL); // Gestion du PWM avec le Thrust
+			  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_4, PWM_BR); // Gestion du PWM avec le Thrust
+		  }
+	  }
+  }
+}
+
+void SystemClock_Config(void)
+{
+  RCC_OscInitTypeDef RCC_OscInitStruct = {0};
+  RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
+  RCC_OscInitStruct.HSEState = RCC_HSE_ON;
+  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
+  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
+  RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL9;
+  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
+                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
+  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
+  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
+  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+}
+
+/* Redefinition of __weak HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+ * This function is called each time a rising or falling edge is detected
+ * on a EXTI pin.
+ */
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+	// Callbacks
+	if(GPIO_Pin == PWM_Killswitch_Pin){ // Killswitch PWM measure
+		uint32_t Current_Ticks = __HAL_TIM_GET_COUNTER(&htim1); // Not outside the if condition because time measure
+		uint32_t PWM_Time = 0;
+		static uint32_t Previous_Killswitch_Ticks = 0;
+
+		if(HAL_GPIO_ReadPin(PWM_Killswitch_GPIO_Port, PWM_Killswitch_Pin)){
+			Previous_Killswitch_Ticks = Current_Ticks;
+		}
+		else{
+			if(Current_Ticks >= Previous_Killswitch_Ticks){
+				PWM_Time = Current_Ticks - Previous_Killswitch_Ticks;
+			}
+			else{
+				PWM_Time = 0xFFFF - Previous_Killswitch_Ticks + Current_Ticks + 1;
+			}
+		}
+
+		if(PWM_Time > 1300){
+			KILL_SWITCH = true;
+
+			PWM_ALL_MOTORS = 1750;
+			__HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, 1750);
+			__HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 1750);
+			__HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_3, 1750);
+			__HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_4, 1750);
+
+			HAL_GPIO_TogglePin(LED_13_GPIO_Port, LED_13_Pin);
+			Error_Handler();
+		}
+
+	}
+
+	else if(GPIO_Pin == PWM_Roll_Pin){
+		uint32_t Current_Ticks = __HAL_TIM_GET_COUNTER(&htim1); // Not outside the if condition because time measure
+		static uint32_t Previous_Roll_Ticks = 0;
+
+		if(HAL_GPIO_ReadPin(PWM_Roll_GPIO_Port, PWM_Roll_Pin)){
+			Previous_Roll_Ticks = Current_Ticks;
+		}
+		else{
+			if(Current_Ticks >= Previous_Roll_Ticks){
+				PWM_Roll.addValue(Current_Ticks - Previous_Roll_Ticks);
+			}
+			else{
+				PWM_Roll.addValue(0xFFFF - Previous_Roll_Ticks + Current_Ticks + 1);
+			}
+		}
+	}
+
+	else if(GPIO_Pin == PWM_Pitch_Pin){
+		uint32_t Current_Ticks = __HAL_TIM_GET_COUNTER(&htim1); // Not outside the if condition because time measure
+		static uint32_t Previous_Pitch_Ticks = 0;
+
+		if(HAL_GPIO_ReadPin(PWM_Pitch_GPIO_Port, PWM_Pitch_Pin)){
+			Previous_Pitch_Ticks = Current_Ticks;
+		}
+		else{
+			if(Current_Ticks >= Previous_Pitch_Ticks){
+				PWM_Pitch.addValue(Current_Ticks - Previous_Pitch_Ticks);
+			}
+			else{
+				PWM_Pitch.addValue(0xFFFF - Previous_Pitch_Ticks + Current_Ticks + 1);
+			}
+		}
+	}
+
+	else if(GPIO_Pin == PWM_Thrust_Pin){
+		uint32_t Current_Ticks = __HAL_TIM_GET_COUNTER(&htim1); // Not outside the if condition because time measure
+		static uint32_t Previous_Thrust_Ticks = 0;
+
+		if(HAL_GPIO_ReadPin(PWM_Thrust_GPIO_Port, PWM_Thrust_Pin)){
+			Previous_Thrust_Ticks = Current_Ticks;
+		}
+		else{
+			if(Current_Ticks >= Previous_Thrust_Ticks){
+				PWM_Thrust.addValue(Current_Ticks - Previous_Thrust_Ticks);
+			}
+			else{
+				PWM_Thrust.addValue(0xFFFF - Previous_Thrust_Ticks + Current_Ticks + 1);
+			}
+		}
+	}
+
+	else if(GPIO_Pin == PWM_Yaw_Pin){
+		uint32_t Current_Ticks = __HAL_TIM_GET_COUNTER(&htim1); // Not outside the if condition because time measure
+		static uint32_t Previous_Yaw_Ticks = 0;
+
+		if(HAL_GPIO_ReadPin(PWM_Yaw_GPIO_Port, PWM_Yaw_Pin)){
+			Previous_Yaw_Ticks = Current_Ticks;
+		}
+		else{
+			if(Current_Ticks >= Previous_Yaw_Ticks){
+				PWM_Yaw.addValue(Current_Ticks - Previous_Yaw_Ticks);
+			}
+			else{
+				PWM_Yaw.addValue(0xFFFF - Previous_Yaw_Ticks + Current_Ticks + 1);
+			}
+		}
+	}
+}
+
+void Error_Handler(void)
+{
+  __disable_irq();
+  if(MOTOR_CAN_TURN){
+	  HAL_TIMEx_PWMN_Stop(&htim2, TIM_CHANNEL_1);
+	  HAL_TIMEx_PWMN_Stop(&htim2, TIM_CHANNEL_2);
+	  HAL_TIMEx_PWMN_Stop(&htim2, TIM_CHANNEL_3);
+	  HAL_TIMEx_PWMN_Stop(&htim2, TIM_CHANNEL_4);
+  }
+
+  while (1)
+  {
+
+  }
+}
+
+void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart){
+	TX_is_Sent = true;
+}
+
+void HAL_UART_TxHalfCpltCallback(UART_HandleTypeDef *huart){
+
+}
+
+#ifdef  USE_FULL_ASSERT
+void assert_failed(uint8_t *file, uint32_t line)
+{
+}
+#endif /* USE_FULL_ASSERT */

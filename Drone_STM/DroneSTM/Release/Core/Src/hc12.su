@@ -1,0 +1,21 @@
+../Core/Src/hc12.cpp:11:6:void hc12_init(HC12_t*)	8	static
+../Core/Src/hc12.cpp:46:6:void hc12_uart_new_byte_management(HC12_t*)	0	static
+../Core/Src/hc12.cpp:193:9:uint8_t hc12_calcul_read_frame_checksum(HC12_t*)	0	static
+../Core/Src/hc12.cpp:106:9:uint8_t hc12_read_master_frame(HC12_t*)	16	static
+../Core/Src/hc12.cpp:211:9:uint8_t hc12_calcul_send_frame_checksum(HC12_t*)	0	static
+../Core/Src/hc12.cpp:229:6:void hc12_reset_frames(HC12_t*)	0	static
+../Core/Src/hc12.cpp:242:6:void hc12_service_A1_mode_requete(HC12_t*)	8	static
+../Core/Src/hc12.cpp:254:6:void hc12_service_B1_mode_ordre(HC12_t*)	8	static
+../Core/Src/hc12.cpp:269:6:void hc12_service_A2_dep_requete(HC12_t*)	8	static
+../Core/Src/hc12.cpp:287:6:void hc12_service_B2_dep_ordre(HC12_t*)	16	static
+../Core/Src/hc12.cpp:310:6:void hc12_service_A3_gps_requete(HC12_t*)	8	static
+../Core/Src/hc12.cpp:326:6:void hc12_service_A4_batterie_requete(HC12_t*)	8	static
+../Core/Src/hc12.cpp:149:9:uint8_t hc12_update_answare_frame(HC12_t*)	8	static
+../Core/Src/hc12.cpp:338:9:uint8_t hc12_get_high_byte(int16_t)	0	static
+../Core/Src/hc12.cpp:347:9:uint8_t hc12_get_low_byte(int16_t)	0	static
+../Core/Src/hc12.cpp:356:9:int16_t hc12_get_value(uint8_t, uint8_t)	0	static
+../Core/Src/hc12.cpp:365:6:void hc12_print_drone_data(UART_HandleTypeDef*, HC12_t*)	176	static
+../Core/Src/hc12.cpp:383:6:void hc12_print_read_frame(UART_HandleTypeDef*, HC12_t*)	128	static
+../Core/Src/hc12.cpp:400:6:void hc12_print_send_frame(UART_HandleTypeDef*, HC12_t*)	128	static
+../Core/Src/hc12.cpp:417:6:void hc12_error_msg(UART_HandleTypeDef*)	112	static
+../Core/Src/hc12.cpp:62:6:void hc12_manage_new_recived_frames(UART_HandleTypeDef*, UART_HandleTypeDef*, HC12_t*)	24	static

@@ -1,0 +1,13 @@
+#include "pid.h"
+#include "utils.h"
+
+double Compute_PID(PID &pid, double measure){
+	double error = pid.setpoint - measure;
+	pid.integral += error;
+    uint32_t derivative = error - pid.previous_error;
+    pid.previous_error = error;
+
+    pid.integral = Constrain(-1000, 1000, pid.integral);
+
+    return (pid.Kp * error) + (pid.Ki * pid.integral) + (pid.Kd * derivative);
+}
